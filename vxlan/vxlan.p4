@@ -59,8 +59,8 @@ header inner_header_t inner_header;
 
 #define ETHERTYPE_IPV4 0x0800
 #define UDP_PROC 0x11
-#define XLAN_PACKET 0x08
 #define VXLAN_UDP_PORT 4789
+#define XLAN_PACKET 0x08
 
 parser start {
   return parse_ethernet;
@@ -91,8 +91,8 @@ parser parse_udp {
 }
 
 parser parse_vxlan {
-  extract(xlan_header);
-  return select(latest.flag) {
+  extract(vxlan_header);
+  return select(latest.flags) {
     XLAN_PACKET: parse_inner_header;
     default: ingress;
   }
@@ -101,4 +101,40 @@ parser parse_vxlan {
 parser parse_inner_header {
   extract(inner_header);
   return ingress;
+}
+
+action add_vxlan_counter() {
+  add_to_field(inner_header.ctr, 1);
+}
+
+action dropPkt() {
+  drop();
+}
+
+table vxlan_counter_table {
+  reads {
+    vxlan_header.vni: exact;
+  }
+  actions {
+    add_vxlan_counter;
+  }
+}
+
+table dropPkt_table {
+  actions {
+    dropPkt;
+  }
+}
+
+// Define control flows
+control ingress {
+  if(valid(vxlan_header)){
+    apply(vxlan_counter_table);
+  } else {
+    apply(dropPkt_table);
+  }
+}
+
+control egress {
+  //It's fine to keep empty
 }
