@@ -103,7 +103,8 @@ parser parse_inner_header {
   return ingress;
 }
 
-action add_vxlan_counter() {
+action add_vxlan_counter(out_port) {
+  modify_field(standard_metadata.egress_spec, out_port);
   add_to_field(inner_header.ctr, 1);
 }
 
