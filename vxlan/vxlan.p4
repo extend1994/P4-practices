@@ -56,3 +56,49 @@ header ipv4_t ipv4_header;
 header udp_t udp_header;
 header vxlan_t vxlan_header;
 header inner_header_t inner_header;
+
+#define ETHERTYPE_IPV4 0x0800
+#define UDP_PROC 0x11
+#define XLAN_PACKET 0x08
+#define VXLAN_UDP_PORT 4789
+
+parser start {
+  return parse_ethernet;
+}
+
+parser parse_ethernet {
+  extract(ethernet_header);
+  return select(latest.etherType) {
+    ETHERTYPE_IPV4 : parse_ipv4;
+    default: ingress;
+  }
+}
+
+parser parse_ipv4 {
+  extract(ipv4_header);
+  return select(latest.protocol) {
+    UDP_PROC: parse_udp;
+    default: ingress;
+  }
+}
+
+parser parse_udp {
+  extract(udp_header);
+  return select(latest.dstPort){
+    VXLAN_UDP_PORT: parse_vxlan;
+    default: ingress;
+  }
+}
+
+parser parse_vxlan {
+  extract(xlan_header);
+  return select(latest.flag) {
+    XLAN_PACKET: parse_inner_header;
+    default: ingress;
+  }
+}
+
+parser parse_inner_header {
+  extract(inner_header);
+  return ingress;
+}
