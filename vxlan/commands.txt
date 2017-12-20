@@ -1,1 +1,6 @@
-table_add vxlan_counter_table add_vxlan_counter 61 => 2
+table_set_default vxlan_verify_udp noop
+table_set_default vxlan_verify_tcp noop
+table_set_default vxlan_verify_icmp noop
+table_add vxlan_verify_udp correct_egress_port 61 1 => 2
+table_add vxlan_verify_tcp correct_egress_port 61 1 => 2
+table_add vxlan_verify_icmp correct_egress_port 61 1 => 2
