@@ -446,7 +446,22 @@ P4 透過定義 table，讓有特定 packet header 的 packet ，做 programmer 
 
 ## Others
 
-狀態儲存，packet 及 metadata instance data 只能存在某個 parsed packet，parse 下個 packet 的時候，instance 會初始化，不過有 counter,meter & register 在整個 pipeline 可以長期存在。
+* Stateful object
+
+  > Keep the state for each packet
+
+  * Counters are incremented with each packet
+  * Meters keep their bucket state
+  * Registers store arbitrary data
+
+* stateless object
+
+  > They are re-initialized for each packet (control flow 結束後)
+
+  * metadata
+  * packet headers
+
+packet 及 metadata instance data 只能存在某個 parsed packet，parse 下個 packet 的時候，instance 會初始化，不過有 counter,meter & register 在整個 pipeline 可以長期存在。
 
 ### counter
 
