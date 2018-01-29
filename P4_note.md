@@ -487,7 +487,7 @@ packet 及 metadata instance data 只能存在某個 parsed packet，parse 下�
 
   * **direct**
 
-    指定的 table 中所有的 entry 都會套用這一個 counter，也就是說這一個 counter 不能被 count 這一個 action 呼叫，否則會出現錯誤
+    指定的 table 中所有的 entry 都會套用這一個 counter，也就是說這一個 counter 不能被 count 這一個 action 呼叫，否則會出現錯誤；不管有沒有 match，每個 entry 都會有一個 counter 
 
   * **static**
 
@@ -552,6 +552,11 @@ packet 及 metadata instance data 只能存在某個 parsed packet，parse 下�
   // use
   register_name[ const_value ]
   register_name[ const_value ].field_name
+
+  // actions
+  register_read(register_array, register_index, destination_field);
+  register_write(register_array, register_index, value);
+    
   ```
 
   layout 則是直接套用一個定義好的 header 結構。
