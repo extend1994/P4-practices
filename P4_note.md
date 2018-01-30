@@ -266,14 +266,6 @@ P4 中 parser 採用 FSM 的設計思路，每個 parser method 都視為一種�
 
     將 Packet header pop 到 array 中
 
-  * ***count(counter_ref, index)***
-
-    更新計數器，將計數器的數值加一，index 參數表示 counter array 的 index（只適用在 static counter 上）
-
-  * ***meter(meter_ref, index, field)***
-
-    更新 meter
-
   * ***generate_digest(receiver, field_list)***
 
     將特定欄位的資料傳送給 reciver，reciver 是一個數字，代表接收端，而接收端的定義不在 P4 的標準當中。
@@ -477,6 +469,11 @@ packet 及 metadata instance data 只能存在某個 parsed packet，parse 下�
       [min_width : const_value;]
       [staturating;]
   }
+
+  // 更新計數器，將計數器的數值加一，index 參數表示 counter array 的 index（只適用在 static counter 上）
+  action action_name(whom_to_set, counter_stat_index) {
+    count(counter_ref, index);
+  }
   ```
 
   * **type** 
@@ -528,6 +525,10 @@ packet 及 metadata instance data 只能存在某個 parsed packet，parse 下�
       [static : table_name;]
       [instance_count : const_value;]
   }
+
+  action action_name(meter_index) {
+    execute_meter(meter_ref, index, field);
+  }
   ```
 
   type、direct、static 以及 instance_count 與 counter 相同，唯一不同的是 result。
@@ -556,7 +557,6 @@ packet 及 metadata instance data 只能存在某個 parsed packet，parse 下�
   // actions
   register_read(register_array, register_index, destination_field);
   register_write(register_array, register_index, value);
-    
   ```
 
   layout 則是直接套用一個定義好的 header 結構。
