@@ -338,7 +338,7 @@ P4 透過定義 table，讓有特定 packet header 的 packet ，做 programmer 
 >   * Actions in the list may be primitive actions or compound actions.
 > *  At run time, the table entry insert operation (not part of P4) must specify:
 >   * Values for each field specified in the reads entry.
->   * The name of the action from the `action_specification` or the `action_-profile_specification` and the parameters to be passed to the action function when it is called.
+>   * The name of the action from the `action_specification` or the `action_profile_specification` and the parameters to be passed to the action function when it is called.
 
 * 語法
 
@@ -379,6 +379,45 @@ P4 透過定義 table，讓有特定 packet header 的 packet ，做 programmer 
         * 沒有特別指定， compiler 會幫設個 default 值
     * `support_timeout`: 就是是否自動 timeout
 
+
+###Action Profile
+
+> *According to spec p54, slide p90*
+>
+> Action profiles are declarative structures specifying a list of potential actions, and possibly other
+> attributes. In the case of that action parameter values are not specific to a match entry but could
+> be shared between different entries. Some tables might even want to share the same set of action parameter values.
+>
+> ***dynamic_action_selection***: Instead of statically binding one particular action profile entry to each match entry,one might want to associate multiple action profile entries with a match entry and let
+> the system (i.e., data plane logic) dynamically bind one of the action profile entries to each class of packets
+>
+> * Separate table match entries from actions and action data
+> * Allow multiple entries to share same action data
+>   * Saves space
+>   * Allows quick update of multiple entries
+> * Allow multiple actions/action_data per entry
+>   * This is called "dynamic action selection"
+>   * Used to implement LAG or ECMP
+> * Can be more efficient compared to explicit implementation
+
+* 語法
+
+  ```c
+  action_profile profile_name {
+    actions {
+      action 1;
+      action 2;
+      ...
+    }
+    [size: const_value;]
+    //dynamic_action_selection
+    [dynamic_action_selection: selector_name;]
+  }
+
+  action_selector selector_name {
+    selection_key : field_list_calculation_name ;
+  }
+  ```
 
 
 ## Control Program (flow control)
