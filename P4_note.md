@@ -422,6 +422,14 @@ P4 透過定義 table，讓有特定 packet header 的 packet ，做 programmer 
   control controlFunctionName {
       apply_table_call | apply_and_select_block | if_else_statement | control_fn_name ( )
   }
+
+  apply_and_select_block ::= apply ( table_name ) { [ case_list ] }
+  case_list ::= action_case + | hit_miss_case +
+  action_case ::= action_or_default control_block
+  action_or_default ::= action_name | default
+  hit_miss_case ::= hit_or_miss control_block
+  hit_or_miss ::= hit | miss
+  // for more, refer spec p59
   ```
 
   * `apply(tableName)` 將 packet 扔到 table 測試
