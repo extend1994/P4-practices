@@ -212,7 +212,10 @@ P4 中 parser 採用 FSM 的設計思路，每個 parser method 都視為一種�
 * 如果 action 需要參數，要在 run time 的時候
 
 
-* [primitive actions](https://github.com/p4lang/behavioral-model/blob/master/docs/simple_switch.md#supported-primitive-actions)
+* primitive actions
+
+  source file: https://github.com/p4lang/behavioral-model/blob/master/targets/simple_switch/primitives.cpp
+  json file: https://github.com/p4lang/p4-hlir/blob/master/p4_hlir/frontend/primitives.json
 
   * ***set_field***
 
