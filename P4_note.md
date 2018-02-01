@@ -100,7 +100,7 @@ P4 整理
   * 要給從 packets parse 出來的，header 為 headerTypeName 的 headerInstanceName， 資源，同時讓 instance 成為 parsed representation 的一部份，可以再後面 match action pipeline 中使用，或是直接引用，像是 `headerInstanceName.fieldName` 這個作法，就像 pointer 一樣。
 
 - fixed length / variable length
-  - 不定長字段計算方法：P4通過對值為“*”的字段的使用，來支持從 packet 中 parse 出不定長的 header instance。該值為“*”的字段的寬度，可以通過由長度屬性說明的，按字節計數的首部總長推出。**字段寬度= (8 \*總長-其它定長字段寬度的總和) (單位：==bit==)**
+  - 不定長字段計算方法：P4 通過對值為 "\*" 的字段的使用，來支持從 packet 中 parse 出不定長的 header instance。該值為"\*"的字段的寬度，可以通過由長度屬性說明的，按字節計數的首部總長推出。**字段寬度= (8 \*總長-其它定長字段寬度的總和) (單位：==bit==)**
 
 * 語法
 
@@ -141,7 +141,7 @@ P4 整理
 
 p4 不想要侷限執行平台，透過 parser 自定義 packet header，並讓 switch 可以執行。
 
-P4 中 parser 採用 FSM 的設計思路，每個 parser method 都視為一種狀態。預期要先看到定義在 starter packet 的 header（`parser start{ packet }`），再根據 packet 的值決定下一個動作。當前處理的 packet header offset 會被記錄在 header instance，並在狀態遷移（調用另一個解析器）時指向 header 中下一個待處理的有效字節，每一個 parser 中都會依據目前所分析的內容來決定下一個 parser，直到回傳的內容為 “ingress"
+P4 中 parser 採用 FSM 的設計思路，每個 parser method 都視為一種狀態。預期要先看到定義在 starter packet 的 header（`parser start{ packet }`），再根據 packet 的值決定下一個動作。當前處理的 packet header offset 會被記錄在 header instance，並在狀態遷移（調用另一個解析器）時指向 header 中下一個待處理的有效字節，每一個 parser 中都會依據目前所分析的內容來決定下一個 parser，直到回傳的內容為 "ingress"
 
 **簡單來說：parser 都是以 start 方法開始，以ingress結束。**
 
