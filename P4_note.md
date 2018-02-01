@@ -68,6 +68,7 @@ P4 整理
   * metadata 用來存數據和配置信息
     * User-Defined Metadata
     * Intrinsic Metadata，含 switch 本身的配置資料，e.g input port number
+      * See BMv2 Simple Switch for example: https://github.com/p4lang/behavioral-model/blob/master/docs/simple_switch.md#intrinsic-metadata
     * **validity**: 
       * 在 parse 過程中被 extract
       * 在 match+action 時被操作，像是 add/copy
