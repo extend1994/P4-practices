@@ -72,6 +72,8 @@ P4 整理
     * **validity**: 
       * 在 parse 過程中被 extract
       * 在 match+action 時被操作，像是 add/copy
+      * parent header 為 valid，child 必為 valid
+      * metadata is *always* valid
     * **<u>Standard Metadata 使用與說明</u>**
       * 使用：`standard_metadata.fieldName`
       * fields
@@ -443,7 +445,7 @@ P4 透過定義 table，讓有特定 packet header 的 packet ，做 programmer 
   * Modify packet
   * Modify metadata
   * Modify egress_spec (e.g. queue, output port)
-    *  ``modify_field(standard_metadata.egress_spec, 1)`;
+    *  `modify_field(standard_metadata.egress_spec, 1)`;
     *  不一定只是個 port 而已，也能是個 route 或是 multicast group 等，而這些東西都會事先於 switch 中先定義好。
 
   最後可能 
@@ -749,6 +751,10 @@ sudo pip install -r requirements.txt
 # 
 sudo python setup.py install
 ```
+
+#### thrift-port
+
+> 網路中 switch 的接口。runtime 階段可以使用這個接口來命令不同的 switch 做不同的事情。
 
 ## How to run p4 program
 
