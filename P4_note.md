@@ -93,7 +93,7 @@ P4 整理
 * header instance 與意義
   * 每個 header 類型都有對應的 header instance 來儲存具體的數據
 
-  ```c
+  ```p4
   header headerTypeName headerInstanceName
   ```
 
@@ -104,7 +104,7 @@ P4 整理
 
 * 語法
 
-  ```c
+  ```p4
   // normal header
   header_type headerTypeName {
     fields{
@@ -155,7 +155,7 @@ P4 中 parser 採用 FSM 的設計思路，每個 parser method 都視為一種�
 
 * 語法
 
-  ```c
+  ```p4
   // parse process entrance
   parser start{
     [return] _parserName_ // enter this parser
@@ -199,7 +199,7 @@ P4 中 parser 採用 FSM 的設計思路，每個 parser method 都視為一種�
 
   - Value sets 
 
-    ```c
+    ```p4
     parser_value_set value_set_name；
     ```
 
@@ -315,7 +315,7 @@ P4 中 parser 採用 FSM 的設計思路，每個 parser method 都視為一種�
 
 * 語法
 
-  ```c
+  ```p4
   //definition
   action actionName([paras]){
     //statements
@@ -348,14 +348,14 @@ P4 透過定義 table，讓有特定 packet header 的 packet ，做 programmer 
 
 * 語法
 
-  ```c
+  ```p4
   table  tableName {
       reads {
           field1: matchType1;
           field2: matchType2;
           ...
       }
-      
+
       actions {
           action1;
           action2;
@@ -408,7 +408,7 @@ P4 透過定義 table，讓有特定 packet header 的 packet ，做 programmer 
 
 * 語法
 
-  ```c
+  ```p4
   action_profile profile_name {
     actions {
       action 1;
@@ -463,7 +463,7 @@ P4 透過定義 table，讓有特定 packet header 的 packet ，做 programmer 
 
 * 語法
 
-  ```c
+  ```p4
   control controlFunctionName {
       apply_table_call | apply_and_select_block | if_else_statement | control_fn_name ( )
   }
@@ -479,7 +479,7 @@ P4 透過定義 table，讓有特定 packet header 的 packet ，做 programmer 
 
   * `apply(tableName)` 將 packet 扔到 table 測試
 
-  * ```c
+  * ```p4
     apply(tableName){
         action_case{
             action_or_default
@@ -514,7 +514,7 @@ packet 及 metadata instance data 只能存在某個 parsed packet，parse 下�
 
 * 語法
 
-  ```c
+  ```p4
   counter counter_name {
       type : packets | bytes;
       [direct : table_name;| static : table_name;]
@@ -557,7 +557,7 @@ packet 及 metadata instance data 只能存在某個 parsed packet，parse 下�
 
 * example
 
-  ```c
+  ```p4
   counter packets_by_source_ip {
   	type: packets;
   	direct: ip_host_table;
@@ -570,7 +570,7 @@ packet 及 metadata instance data 只能存在某個 parsed packet，parse 下�
 
 * 語法
 
-  ```c
+  ```p4
   meter meter_name {
       type : bytes | packets;
       result : field_ref;
@@ -594,7 +594,7 @@ packet 及 metadata instance data 只能存在某個 parsed packet，parse 下�
 
 * 語法
 
-  ```c
+  ```p4
   register register_name {
       width : const_value; | layout : header_type_name;
       [direct : table_name;]
@@ -627,7 +627,7 @@ packet 及 metadata instance data 只能存在某個 parsed packet，parse 下�
 
 讓處理過程變得更加方便，如 hash function 中，可以把 field list 當作函數輸入，根據此 list 計算 checksum
 
-```
+```p4
 field_list listName {
   instanceName.headerField;
   ...
@@ -639,7 +639,7 @@ field_list listName {
 > A set of protocol dependent API is auto-generated from the P4 code as part of the compilation processes.  These API provide a consistent set of primitives to manipulate data structures as defined within the P4 code.  The header file for the API can be found in build/inc/p4_sim/pd.h after compilation of the behavioral model.
 
 A sample set of the auto-generated API is shown below:
-```
+```p4
 bf_pd_status_t bf_pd_dc_full_ipv4_fib_table_add_with_fib_hit_nexthop( bf_pd_sess_hdl_t sess_hdl, bf_pd_dev_target_t dev_tgt, bf_pd_dc_full_ipv4_fib_match_spec_t *match_spec, bf_pd_dc_full_fib_hit_nexthop_action_spec_t *action_spec, bf_pd_entry_hdl_t *entry_hdl );
 bf_pd_status_t bf_pd_dc_full_ipv4_fib_table_delete ( bf_pd_sess_hdl_t sess_hdl, uint8_t dev_id, bf_pd_entry_hdl_t ent_hdl  );
 bf_pd_status_t bf_pd_dc_full_ipv4_fib_table_modify_with_fib_hit_ecmp ( bf_pd_sess_hdl_t sess_hdl, uint8_t dev_id, bf_pd_entry_hdl_t entry_hdl, bf_pd_dc_full_fib_hit_ecmp_action_spec_t *action_spec );
@@ -663,7 +663,7 @@ bf_pd_status_t bf_pd_dc_full_ipv4_fib_set_default_action_on_miss ( bf_pd_sess_hd
 * pip - python package manager
 * mininet - simulate network environment
 * Python packages: scapy, thrift (>= 0.9.2) and networkx
-```
+```shell
 sudo apt-get install python-pip
 sudo apt-get install mininet
 sudo pip install scapy thrift networkx
