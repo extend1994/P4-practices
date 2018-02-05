@@ -646,6 +646,158 @@ bf_pd_status_t bf_pd_dc_full_ipv4_fib_table_modify_with_fib_hit_ecmp ( bf_pd_ses
 bf_pd_status_t bf_pd_dc_full_ipv4_fib_set_default_action_on_miss ( bf_pd_sess_hdl_t sess_hdl, bf_pd_dev_target_t dev_tgt, bf_pd_entry_hdl_t *entry_hdl );
 ```
 
+
+# P4_16
+
+## Header Data Types
+
+### Basics
+
+* ***bit\<n>***: Unsigned integer of length n, bit == bit\<1>
+* ***int\<n>***: Signed integer of length n >= 2
+* ***varbit\<n>***: variable length bitstring
+
+### Derived
+
+* ***header***
+  * Byte-aligned
+  * valid/invalid
+  * Can contain basic types
+* ***struct***: array of headers
+* ***typedef***: alia of another type
+
+### Example
+
+```p4
+typedef bit<48> mac_addr_t;
+
+header ethernet_t {
+  bit<48> dstAddr;
+  //or mac_addr_t dstAddr;
+  bit<48> srcAddr;
+  bit<16> etherType;
+}
+
+header vlan_tag_t {
+  bit<3> pri;
+  bit<1> cfi;
+  bit<12> vid;
+  bit<16> etherType;
+}
+
+struct my_headers_t {
+  ethernet_t ethernet;
+  vlan_tag_t[2] vlan_tag;
+}
+
+header ipv4_options_t {
+  varbit<320> options;
+}
+```
+
+## Declaring and Initializing Variables
+
+```p4
+bit<16> my_var;
+bit<8> another_var = 5;
+
+const bit<16> ETHERTYPE_IPV4 = 0x0800; //Better than #define!
+const bit<16> ETHERTYPE_IPV6 = 0x86DD;
+
+ethernet_t eth;
+vlan_tag_t vtag = { 3w2, 0, 12w13, 16w0x8847 }; //Safe constants with explicit widths
+```
+
+## Parser
+
+```p4
+parser MyParser(packet_in               packet
+                out   my_headers_t      hdr
+                inout my_metadata_t     meta
+                inout standard_metada_t standard_metadata)
+{
+  state start {
+    packet.extract(hdr.ethernet);
+    transition select(hdr.ethernet.etherType) {
+      0x8100 &&& 0xEFFF : parse_vlan_tag;
+      0x0800 : parse_ipv4;
+      0x86DD : parse_ipv6;
+      0x0806 : parse_arp;
+      default : accept;
+    }
+  }
+
+  state parse_vlan_tag {
+    packet.extract(hdr.vlan_tag.next);
+    transition select(hdr.vlan_tag.last.etherType) {
+      0x8100 : parse_vlan_tag;
+      0x0800 : parse_ipv4;
+      0x86DD : parse_ipv6;
+      0x0806 : parse_arp;
+      default : accept;
+    }
+  }
+
+  state parse_ipv4 {
+    packet.extract(hdr.ipv4);
+    transition select(hdr.ipv4.ihl) {
+      0 .. 4: reject;
+      5: accept;
+      default: parse_ipv4_options;
+    }
+  }
+
+  state parse_ipv4_options {
+    packet.extract(hdr.ipv4.options,
+                   (hdr.ipv4.ihl - 5) << 2);
+    transition accept;
+  }
+
+  state parse_ipv6 {
+    packet.extract(hdr.ipv6);
+    transition accept;
+  }
+}
+```
+
+## Controls, table & actions
+> if() statements are allowed in actions too!
+```p4
+const bit<9> DROP_PORT = 511; /* Specific to V1 architecture */
+
+action mark_to_drop() { /* Already defined in v1model.p4 */
+  standard_metadata.egress_spec = DROP_PORT;
+  standard_metadata.mgast_grp = 0;
+}
+
+control MyIngress(
+  inout my_headers_t        hdr,
+  inout my_metadata_t       meta,
+  inout standard_metadata_t standard_metadata
+{
+  /* Local Declarations */
+  action swap_mac(inout bit<48> dst, inout bit<48> src) {
+    bit<48> tmp;
+    tmp = dst; dst = src; src = tmp;
+  }
+
+  action reflect_to_other_port() {
+    standard_metadata.egress_spec = standard_metadata.ingress_port ^ 1;
+  }
+
+  bit<48> tmp;
+  apply {
+    /* Can also do assignment directly */
+    if (hdr.ethernet.dstAddr[40:40] == 0x1) {
+      mark_to_drop();
+    } else {
+      swap_mac(hdr.ethernet.dstAddr, hdr.ethernet.srcAddr);
+      reflect_to_other_port();
+    }
+  }
+}
+```
+
 # P4 playground
 
 ## P4 repositories
