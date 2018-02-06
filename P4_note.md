@@ -762,6 +762,13 @@ parser MyParser(packet_in               packet
 
 ## Controls, table & actions
 > if() statements are allowed in actions too!
+
+### Standard Arithmetic and Logical operations
+* +, -, *
+* ~, &, |, ^, >>, <<
+* ==, !=, >, >=, <, <=
+* **No division/modulo**
+
 ```p4
 const bit<9> DROP_PORT = 511; /* Specific to V1 architecture */
 
