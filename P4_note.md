@@ -805,6 +805,45 @@ control MyIngress(
 }
 ```
 
+### Actions Galore: Operating on Headers
+* Header Validity bit manipulation
+  ```p4
+  header.setValid();   // add_header
+  header.setInvalid(); // remove_header
+  header.isValid();
+  ```
+
+* Header Assignment
+  ```p4
+  header = { f1, f2, ..., fn }
+  header1 = header2
+  ```
+* Special operations on Header Stacks
+  * In the parsers
+    * `header_stack.next`
+    * `header_stack.last`
+    * `header_stack.lastIndex`
+  * In the controls
+    * `header_stack[i]`
+    * `header_stack.size`
+    * `header_stack.push_front(int count)`
+    * `header_stack.pop_front(int count)`
+### Actions Galore: Bit Manipulation
+  * Bit-string concatenation
+    ```p4
+    action set_ipmcv4_mac_da_1() {
+      hdr.ethernet.dstAddr = 24w0x01005E ++ 1w0 ++ hdr.ipv4.dstAddr[22:0];
+    }
+    ```
+  * Bit-slicing
+    ```p4
+    action set_ipmcv4_mac_da_2() {
+      hdr.ethernet.dstAddr[47:24] = 0x01005E;
+      hdr.ethernet.dstAddr[23:23] = 0;;
+      hdr.ethernet.dstAddr[22:0] = hdr.ipv4.dstAddr[22:0];
+    }
+    ```
+
 # P4 playground
 
 ## P4 repositories
