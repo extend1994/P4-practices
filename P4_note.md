@@ -33,6 +33,21 @@ P4 整理
 
 * P4 switch 中含有兩條 pipeline: ingress & egress；同時還有一些數據流管理功能，例如：擁塞控制，隊列控制，流量複製等。 
 
+### Openflow SDN and P4 in common
+
+#### Data Plane (P4) Program
+
+* Defines the format of the table
+  * Key Fields
+  * Actions
+  * Action Data
+* Performs the lookup
+* Executes the chosen action
+
+#### Control Plane (IP stack, Routing protocols)
+
+Populates table entries with specific information (based on the configuration, automatic discovery and protocol calculations)
+
 ## Packet 如何被 P4 處理 - Forwarding model
 
 ![](https://camo.githubusercontent.com/c0a689118891e31bfd379911a4d362eb81d07ac1/68747470733a2f2f7777772e657665726e6f74652e636f6d2f6c2f41533565564459775572524d7872723578426e767a566a476458337451522d44326945422f696d6167652e706e67)
