@@ -859,6 +859,130 @@ control MyIngress(
     }
     ```
 
+### Match-Action Table
+
+Defines
+
+* What to match on and match type
+* A list of possible actions
+* Additional properties
+  * size
+  * Default action
+  * entries
+* Each table contains one or more entries
+  * An entry contains
+    * A specific key to match on
+    * A single action
+    * (Optional) action data
+
+1. Define Actions
+  * Actions can use two types of parameters
+    * Directional (from the Data Plane)
+      * Actions that are called directly **can only** this kind
+    * Directionless (from the Control Plane)
+  * Actions used in tables:
+    * Typically use direction-less parameters
+    * May sometimes use directional parameters too
+  * P4_16 has typecasts: `(bit<16>)ecmp_group`
+
+  ```p4
+    action l3_switch(bit<9> port,
+                     bit<48> new_mac_da,
+                     bit<48> new_mac_sa,
+                     bit<12> new_vlan)
+    {
+      /* Forward the packet to the specified port */
+      standard_metadata.metadata.egress_spec = port
+
+      /* L2 Modifications */
+      hdr.ethernet.dstAddr = new_mac_da;
+      hdr.ethernet.srcAddr = mac_sa;
+      hdr.vlan_tag[0].vlanid = new_vlan;
+
+      /* IP header modification (TTL decrement) */
+      hdr.ipv4.ttl = hdr.ipv4.ttl – 1;
+    }
+
+    action l3_l2_switch(bit<9> port) {
+      standard_metadata.metadata.egress_spec = port;
+    }
+
+    action l3_drop() {
+      mark_to_drop();
+    }
+  ```
+
+2. Define table
+
+   ```p4
+   table ipv4_host {
+     key = {
+       meta.ingress_metadata.vrf: exact;
+       hdr.ipv4.dstAddr         : exact;
+     }
+     actions = {
+       l3_switch;  l3_l2_switch;
+       l3_drop;    noAction;
+     }
+     default_action = noAction(); // Defined in core.p4
+     size = 65536;
+   }
+   ```
+
+3. Using Tables in the Controls (***Important Example***)
+   ```p4
+    control MyIngress(inout my_headers_t
+                      hdr,
+                      inout my_metadata_t
+                      meta,
+                      inout standard_metadata_t standard_metadata)
+    {
+      /* Declarations */
+      action l3_switch(...) {...}
+      action l3_l2_switch(...) {...}
+      ...
+      table assign_vrf {...}
+      table ipv4_host {...}
+      table ipv6_host {...}
+
+      apply {
+        assign_vrf.apply(); // Apply() Tables – Perform Match-Action
+          if (hdr.ipv4.isValid()) { // Make sure the table matches on valid headers
+            ipv4_host.apply();
+          }
+      }
+
+      apply {
+        ...
+        if (hdr.ipv4.isValid()) {
+          if (!ipv4_host.apply().hit) { // Apply method returns a boolean, representing the hit
+            ipv4_lpm.apply();
+          }
+        }
+      }
+
+      apply {
+        ...
+        /**********************************************
+          Switch() statement
+          - Only used for the results of match-action
+          - Each case should be a block statement
+          - Default case is optional
+
+          Exit and Return Statements
+          - return – go to the end of the current control
+          - exit – go to the end of the top-level control
+          - Useful to skip further processing
+        **********************************************/
+        switch (ipv4_lpm.apply().action_run) {
+          l3_switch_nexthop: { nexthop.apply(); }
+             l3_switch_ecmp: { ecmp.apply(); }
+                    l3_drop: { exit; } //
+                    default: { /* Not needed. Do nothing */ }
+        }
+      }
+   ```
+
 # P4 playground
 
 ## P4 repositories
