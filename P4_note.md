@@ -474,6 +474,7 @@ P4 透過定義 table，讓有特定 packet header 的 packet ，做 programmer 
 
 * ***egress*** 將 Queue 的資料拿出來，再次處理 (modify) 並且將封包送出、丟棄、複製或是重新處理（recirculate）
   * 可以透過 standard_metadata 取得 egress_port 這一個值（唯讀）來判斷要做什麼事情。
+  * The packet is regenerated based on the updated PR header instances.
 
 
 * 語法
