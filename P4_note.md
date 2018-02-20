@@ -852,6 +852,7 @@ control MyIngress(
     }
     ```
   * Bit-slicing
+    Usage: `header.field[msb:lsb]`
     ```p4
     action set_ipmcv4_mac_da_2() {
       hdr.ethernet.dstAddr[47:24] = 0x01005E;
