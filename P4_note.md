@@ -82,6 +82,7 @@ Populates table entries with specific information (based on the configuration, a
 * 要宣告有哪些可用的 header，類型有兩種：**packet header** & **metadata**，主要差別是 valid bit
   * metadata 用來存數據和配置信息
     * User-Defined Metadata
+      * To access queueing information: [queueing_metadata](https://github.com/p4lang/behavioral-model/blob/master/docs/simple_switch.md#queueing_metadata-header)
     * Intrinsic Metadata，含 switch 本身的配置資料，e.g input port number
       * See BMv2 Simple Switch for example: https://github.com/p4lang/behavioral-model/blob/master/docs/simple_switch.md#intrinsic-metadata
     * **validity**: 
@@ -1145,7 +1146,6 @@ sudo python setup.py install
    sudo ./p4dbg.py [--thrift-port <port>]
    ```
 
-
 ## tutorials
 
 ```shell
@@ -1154,8 +1154,6 @@ git clone https://github.com/p4lang/tutorials.git
 ```
 
 每個 tutorial 都有個 commands.txt，指令都需要寫在裡面，更多參考 https://github.com/p4lang/behavioral-model#using-the-cli-to-populate-tables
-
-
 
 #  相關論文
 
@@ -1178,10 +1176,3 @@ xterm -fa Monospace -fs 12
 * Communication commands: [sniff](http://xiaix.me/python-shi-yong-scapy-jin-xing-zhua-bao/)
 * Scapy doc: http://www.secdev.org/projects/scapy/files/scapydoc.pdf
 
-[primitive actions](https://github.com/p4lang/behavioral-model/blob/master/docs/simple_switch.md#supported-primitive-actions)
-
-- The packet is regenerated based on the updated PR header instances.
-
-
-
-一個 action 裡面的 primitive actions 是**<u>平行執行</u>**的
