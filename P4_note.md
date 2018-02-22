@@ -1176,3 +1176,43 @@ xterm -fa Monospace -fs 12
 * Communication commands: [sniff](http://xiaix.me/python-shi-yong-scapy-jin-xing-zhua-bao/)
 * Scapy doc: http://www.secdev.org/projects/scapy/files/scapydoc.pdf
 
+
+### Run P4 on the machine of lab215 - Vagrant
+
+* https://gogojimmy.net/2013/05/26/vagrant-tutorial/
+
+自動化虛擬機的安裝和配置過程，如開機、安裝 MySQL、網路環境配置、主機與虛擬機間的文件共享等，配合 *Vagrantfile* 使用。Vagrant 視虛擬機為「Provider」、映像檔（ Image ）為「Box」
+
+* 常用指令
+
+  ```shell
+  # vagrant box
+  vagrant box list
+  vagrant box add <Box name> <Download url or box file> # Decide OS on th
+  vagrant box remove
+  # 初始化 Box，產生 Vagrantfile
+  vagrant init
+  # 開機
+  vagrant up
+  # 休眠
+  vagrant suspend
+  # 取消休眠
+  vagrant resume
+  # 關機
+  vagrant halt
+  # 重新開機
+  vagrant reload
+  # 以完整的配置開機
+  vagrant provision
+  # ssh 到虛擬主機
+  vagrant ssh
+  vagrant ssh-config
+  # 停止虛擬機運作並銷毀所有資源
+  vagrant destroy
+  # 環境打包
+  vagrant package
+  # 看狀態
+  vagrant status
+  vagrant global-status
+  ```
+
