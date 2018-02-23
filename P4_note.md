@@ -986,6 +986,57 @@ Defines
       }
    ```
 
+## Packet Deparsing
+See more details on page 97 of v1 spec.
+```p4
+  // Expressed as another control function - normal one
+  control MyDeparser(packet_out packet,
+                             in my_headers_t hdr)
+  {
+    apply {
+      /* Layer 2 */
+      packet.emit(hdr.ethernet);
+      packet.emit(hdr.vlan_tag);
+
+      /* Layer 2.5 */
+      packet.emit(hdr.mpls);
+
+      /* Layer 3 */
+      packet.emit(hdr.arp);
+      packet.emit(hdr.arp_ipv4);
+      packet.emit(hdr.ipv4);
+      packet.emit(hdr.ipv6);
+
+      /* Layer 4 */
+      packet.emit(hdr.icmp);
+      packet.emit(hdr.tcp);
+      packet.emit(hdr.udp);
+    }
+  }
+
+  // Simplified Deparsing
+  struct my_headers_t {
+    ethernet_t     ethernet;
+    vlan_tag_t [2] vlan_tag;
+    mpls_t     [5] mpls;
+    arp_t          arp;
+    arp_ipv4_t     arp_ipv4;
+    ipv4_t         ipv4;
+    ipv6_t         ipv6;
+    icmp_t         icmp;
+    tcp_t          tcp;
+    udp_t          udp;
+  }
+
+  control MyDeparser(packet_out packet,
+                in my_headers_t hdr)
+  {
+    apply {
+      packet.emit(hdr); // Headers will be deparsed in struct order
+    }
+  }
+```
+
 # P4 playground
 
 ## P4 repositories
