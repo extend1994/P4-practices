@@ -1042,10 +1042,13 @@ See more details on page 97 of v1 spec.
 ## P4 repositories
 
 * [p4c-bm](https://github.com/p4lang/p4c-bm) a.k.a p4c-bmv2
-  * behavioral modal的後端編譯器，建立在p4-hilr的頂部，該模塊以P4程序作為輸入，輸出一個可以載入到behavioral model的JSON配置文件。
+  * behavioral modal 的後端編譯器，建立在 p4-hlir 的頂部，該模塊以P4程序作為輸入，輸出一個可以載入到 behavioral model 的 json 配置文件。
 * [behavioral-model](https://github.com/p4lang/behavioral-model) a.k.a bmv2
   * 模擬 P4 switch （ 即 ***P4 target*** ）， C++ 寫的
   * p4c-bm 將 P4 program 編譯成 json 格式的配置文件，並將之載入到 bmv2，轉化成能實現 switch 功能的數據結構
+* [p4-hlir](https://github.com/p4lang/p4-hlir)
+  * 前端編譯器
+  * Translates P4 code to High-Level Intermediate Representation (HLIR)
 * p4factory
   * 內含整套用以運行和開發基於behavioral model的P4程序環境的代碼，幫助用戶快速開發P4程序。
 
@@ -1147,6 +1150,58 @@ sudo python setup.py install
 
 > 網路中 switch 的接口。runtime 階段可以使用這個接口來命令不同的 switch 做不同的事情。
 
+## [p4-hlir](https://github.com/p4lang/p4-hlir)
+> p4-hlir translates P4 code to ***HLIR***(**H**igh-**L**evel **I**ntermediate **R**epresentation),
+> which is similar to Abstract Syntax Trees (AST).
+
+* Currently represented as a hierarchy of Python objects and only support P4_14
+* Frees backend developers from the burden of syntax analysis and target-independent semantic checksi
+* HLIR documentation is supplied with the frontend code
+
+### 使用工具與方法
+* 驗證 P4_14 語法
+  ```shell
+  p4-validate <path_to_p4_program>
+  ```
+* 使用 Python interacitve shell 來存取 HLIR instances
+  ```
+  # Method 1 - Use built HLIR
+  p4-shell <path_to_p4_program>
+
+  # Method 2 - Manually build HLIR
+  python
+  >>> from p4_hlir.main import HLIR
+  >>> h = HLIR(<path_to_p4_program>)
+  >>> h.build()
+  ```
+
+  用完上面其中一個方法後，在 Python Interactive mode 中可以透過以下存取 instances
+  ```python
+  h.p4_actions
+  h.p4_control_flows
+  h.p4_headers
+  h.p4_header_instances
+  h.p4_fields
+  h.p4_field_lists
+  h.p4_field_list_calculations
+  h.p4_parser_exceptions
+  h.p4_parse_value_sets
+  h.p4_parse_states
+  h.p4_counters
+  h.p4_meters
+  h.p4_registers
+  h.p4_nodes
+  h.p4_tables
+  h.p4_action_profiles
+  h.p4_action_selectors
+  h.p4_conditional_nodes
+  h.p4_ingress_ptr
+  h.p4_egress_ptr
+  ```
+* 產生 P4_14 Table graph/parse graph AST png 檔案與表示其關係的 dot 檔
+  ```shell
+  p4-graphs <path_to_p4_program>
+  ```
 ## How to run p4 program
 
 1. 用 `p4c-bmv2` 產生 `.json` 給  `bmv2`  ，讓 `bmv2` 知道要初始化什麼 table, 怎麼設置 parser 等等
