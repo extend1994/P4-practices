@@ -1049,7 +1049,7 @@ See more details on page 97 of v1 spec.
 * [p4-hlir](https://github.com/p4lang/p4-hlir)
   * 前端編譯器
   * Translates P4 code to High-Level Intermediate Representation (HLIR)
-* p4factory
+* [p4factory](https://github.com/p4lang/p4factory)
   * 內含整套用以運行和開發基於behavioral model的P4程序環境的代碼，幫助用戶快速開發P4程序。
 
 ## Set up required environment
