@@ -1052,6 +1052,14 @@ See more details on page 97 of v1 spec.
 * [p4factory](https://github.com/p4lang/p4factory)
   * 內含整套用以運行和開發基於behavioral model的P4程序環境的代碼，幫助用戶快速開發P4程序。
 
+## Modular Compiler
+![modular.png](https://i.imgur.com/8R4z3Dl.png)
+Single Front-End (p4-hlir) + Multiple backends.
+Backends involve
+* Code generators for various targets, e.g. Software Switch Model (p4c-bm)
+* Validators and graph generators
+* Run-time API generators
+
 ## Set up required environment
 
 * pip - python package manager
