@@ -30,3 +30,4 @@ cd build
 cmake ..
 make -j4
 make -j4 check
+sudo make install # Enables commands to the global scale
