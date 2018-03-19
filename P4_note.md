@@ -1267,7 +1267,12 @@ sudo python setup.py install
 git clone https://github.com/p4lang/tutorials.git
 ```
 
-每個 tutorial 都有個 commands.txt，指令都需要寫在裡面，更多參考 https://github.com/p4lang/behavioral-model#using-the-cli-to-populate-tables
+每個 tutorial 都有個 commands.txt，指令都需要寫在裡面，更多參考 https://github.com/p4lang/behavioral-model#using-the-cli-to-populate-tablesi
+
+# TODO
+- [ ] how to use debugger
+- [ ] event log tool
+- [ ] other tools
 
 #  相關論文
 
