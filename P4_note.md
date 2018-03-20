@@ -397,7 +397,7 @@ P4 透過定義 table，讓有特定 packet header 的 packet ，做 programmer 
 
         * `min_size`: table 最少要有幾個 entries 符合，否則會有 error 出現
         * `max_size`: entries 最大數量，超過這個數量，table 不再執行 action （ table 可以 support 的最大 entries 數量）
-        * `size`: 符合特定 size 才會運作
+        * `size`: 符合特定 size 才會運作 -> 可以理解程 table entry 的個數
         * 沒有特別指定， compiler 會幫設個 default 值
     * `support_timeout`: 就是是否自動 timeout
 
