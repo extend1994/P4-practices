@@ -6,19 +6,19 @@ P4 整理
 * reconfigurability
   * 描述 target switch 內部的 pipeline，有很多 table，要 match 哪些 fields、做什麼事情，希望下 program 就可以輕易更改 parser。p4 的 compiler 採用了模組化的設計，各模組都有 configurality，像是 p4c-bm 的輸出為 bmv2 的輸入。
 * protocol independence
-  * 硬體設備不應該被 protocol 所限制，p4 使得我們有能力 specify parser 怎麼行為，table match 哪些 field 後要做哪些 action，執行 action 的能力跟傳統的 SDN 差很多。
+  * 硬體設備不應該被 protocol 所限制，P4 使得我們有能設定 parser 怎麼處理封包，table match 哪些 field 後要做哪些 action，執行 action 的能力跟傳統的 SDN 差很多。
 * target independence
-  * P4 不希望限制特定的執行平台，希望各式各樣的switch，甚至網卡、software switch都可以運行。
+  * P4 不希望限制特定的執行平台，希望各式各樣的 switch，甚至網卡和 software switch 都能運行。
 
 ## 關於 switch 的結構
 
 ### 以往的 SDN
 
-以前 openflow 一般的做法是：SDN controller 中有 app，app 根據DO(?)、邏輯 ，透過 openflow protocol 將 rule 下至 table。但都是假設 switch 中的 main interfere 是固定的（通常就是標準的 IPv4, IPv6），之後有人提出「那麼是否可以提出 p4 program 的組態，將 rule 透過編譯器下到 copy 到 switch 裡，此時就可以根據不同使用者自定義這個 switch 來接受不同格式（ header 不同）的 packet 」，所以在 SDN 中，controller 對 swith 透過 openflow protocol 下 rule。switch 中會進入 ***pipeline*** 檢查 tag，***Vlan tag*** 是所有 switch 都會檢查的部份，其他 datagram 的部份，就看是哪個廠商的 switch，IC design 會決定需要檢查的有哪些。基本上就是根據 header 的資訊重複查表，match，action的過程。
+以前 openflow 一般的做法是：SDN controller 中有 app，app 根據DO(?)、邏輯 ，透過 openflow protocol 將 rule 下至 table。但都是假設 switch 中的 main interfere 是固定的（通常就是標準的 IPv4, IPv6），之後有人提出「那麼是否可以提出 P4 program 的組態，將 rule 透過編譯器下到 copy 到 switch 裡，此時就可以根據不同使用者自定義這個 switch 來接受不同格式（header 不同）的 packet 」，所以在 SDN 中，controller 對 switch 透過 openflow protocol 下 rule。switch 中會進入 ***pipeline*** 檢查 tag，***Vlan tag*** 是所有 switch 都會檢查的部份，其他 datagram 的部份，就看是哪個廠商的 switch，IC design 會決定需要檢查的有哪些。
 
 ### Now P4
 
-在 P4 架構中 controller 下到 rule translator，swith 本身要給出 API，target 就是 P4 switch。一般的 Switch，包含 SDN Switch 都只能夠處理一般的封包，例如 Ethernet、VLAN、IPv4 等等。
+在 P4 架構中 controller 下到 rule translator，switch 本身要給 API，target 就是 P4 switch。一般的 Switch，包含 SDN Switch 都只能夠處理現存協定之封包（IPv4等）。
 
 透過 P4，開發者能夠直接定義出一個 switch 能夠處理的封包格式，舉例來說：定義一個新的 ethernet type，或是自行定義封包結構。另外，p4 switch 不被侷限現在特定的硬體之下執行，只需要有對應的編譯器就可以佈署，這部份之後會在說明。
 
@@ -29,7 +29,6 @@ P4 整理
 * metadata: 在 pipeline 中的 data， control flow 結束後，就會被重置
 
   * > Packets can carry additional information between stages, called metadata, which is treated identically to packet header fields 
-
 
 * P4 switch 中含有兩條 pipeline: ingress & egress；同時還有一些數據流管理功能，例如：擁塞控制，隊列控制，流量複製等。 
 
@@ -52,14 +51,11 @@ Populates table entries with specific information (based on the configuration, a
 
 ![](https://camo.githubusercontent.com/c0a689118891e31bfd379911a4d362eb81d07ac1/68747470733a2f2f7777772e657665726e6f74652e636f6d2f6c2f41533565564459775572524d7872723578426e767a566a476458337451522d44326945422f696d6167652e706e67)
 
-1. 從 input port 進來，抵達封包首先被 parser 處理：辨認 ( *recognize* ) 並提取 ( *extract* ) packet header fields，不對 packet header 做任何假設，一切自己定義，將結果放在 parser graph，所以 packet 進來後，會依照定義的 parser graph，符合的 header 都會被抓出來（這是硬體廠商要做的事）。
-
-   **簡單來說，parser 會辨認、抽出 header field 放到 action table 裡面。** 
+1. 從 input port 進來，抵達封包首先被 parser 處理：辨認 ( *recognize* ) 並提取 ( *extract* ) packet header fields，不對 packet header 做任何假設，將結果放在 parser graph。packet 進來到s switch 就會依照 parser graph，抓出 match 的 header（怎麼抓硬體廠商要做的事）。
 
 2. 提取出的 header fields會被傳到 match+action tables
 
-3. Parser 處理完封包之後，會將相關的資料，例如解析出來的 header 以及 metadata 儲存，然後交由 ingress 
-   處理，ingress 會將封包送往不同的 table、更改封包 header 內容、設定封包輸出的 port 等等，最後再丟到一個 queue 中
+3. Parser 處理完封包之後，會將相關的資料，例如解析出來的 header 以及 metadata 儲存，然後交由 ingress 處理：ingress 將封包送往不同的 table、更改封包 header 內容、設定封包輸出的 port 等等，最後再丟到一個 queue 中
 
    * match + aciton，跟 SDN 一樣也是 pipeline、multiple table，分成兩個部分：Ingress/Engress pipeline，不過不是一定得走 pipeline，如果有進來，我們可以對 packet 做修改(e.g by save field action)，也可以決定 egress 的 selection（決定 packet 要從哪個 port(s) 出去）。
    * Control progran:  寫 action, 宣告 table 組態。
@@ -68,8 +64,6 @@ Populates table entries with specific information (based on the configuration, a
 
 1. 定義 parser, flow，經 compiler 編譯後會輸出 json 格式的 switch 配置文件及對應的 API
 2. 根據配置文件更新 parser 及 match+action table，然後查表操作
-   ![](http://img1.sdnlab.com/wp-content/uploads/2016/09/P4-Fig-5.png)
-3. ![](http://img1.sdnlab.com/wp-content-uploads/2016/11/P4-code-fig-3.png)
 
 ## Header Specification
 
@@ -1157,6 +1151,7 @@ sudo python setup.py install
 #### thrift-port
 
 > 網路中 switch 的接口。runtime 階段可以使用這個接口來命令不同的 switch 做不同的事情。
+> ***P4 中預設為 9090***
 
 ## [p4-hlir](https://github.com/p4lang/p4-hlir)
 > p4-hlir translates P4 code to ***HLIR***(**H**igh-**L**evel **I**ntermediate **R**epresentation),
@@ -1212,45 +1207,45 @@ sudo python setup.py install
   ```
 ## How to run p4 program
 
-1. 用 `p4c-bmv2` 產生 `.json` 給  `bmv2`  ，讓 `bmv2` 知道要初始化什麼 table, 怎麼設置 parser 等等
+1. 用 `p4c-bmv2` 產生 `.json` 給  `bmv2`  ，讓 `bmv2` 配置環境中的 switch
 
    ```shell
-   p4c-bmv2 --json <path to JSON file> <path to P4 file>
+   p4c-bmv2 <path_to_source_P4_file> --json <output_JSON_file_with_path>
    ```
 
-2. 使用 `bmv2` 佈署要 p4 target 及環境
-
-   1. 產生網路 topology （可以自己寫一個 python 檔，或者使用 `bmv2` repo 底下 mininet 資料夾中已經寫好的 topo：`1sw_demo.py`）
-
-   2. examples: 
-
-      https://github.com/TakeshiTseng/2016-nctu-p4-workshop/blob/master/overlay/topology.py  
-      https://github.com/TakeshiTseng/2016-nctu-p4-workshop/blob/master/stateful-example/topology.py
-      https://github.com/p4lang/tutorials/blob/master/SIGCOMM_2015/source_routing/topo.py
+2. Start the switch with desired topology
 
    ```shell
-
-   ../../bmv2/tools/runtime_CLI.py --json <path to JSON file> --thrift-port <port>
-   cd ~/repos/p4/bmv2/mininet/
-   sudo python ../../bmv2/mininet/1sw_demo.py --behavioral-exe ../../bmv2/targets/simple_switch/simple_switch --json 
-
-   sudo python ../bmv2/mininet/1sw_demo.py --behavioral-exe ../bmv2/targets/simple_router/simple_router --json ../targets/simple_router/simple_router.json
-   #sudo ./simple_switch -i 0@<iface0> -i 1@<iface1> <path to JSON file>
+   # Start the switch first if you need to enable debugger
    #<iface0> and <iface1> are the interfaces which are bound to the switch (as ports 0 and 1).
+   $SWITCH_PATH [-i 0@<iface0> -i 1@<iface1>] [--nanolog] [--debugger] [--no-p4] <JSON_for_switch>
+   # interfaces usage example: $SWITCH_PATH -i 0@veth0 -i 1@veth2
+
+   # Use simple topology
+   sudo python bmv2/mininet/1sw_demo.py --behavioral-exe $SWITCH_PATH --json <JSON_for_switch>
    ```
 
-3. 用 CLI
+   Self-defined topology, e.g.
+   * https://github.com/TakeshiTseng/2016-nctu-p4-workshop/blob/master/overlay/topology.py
+   * https://github.com/TakeshiTseng/2016-nctu-p4-workshop/blob/master/stateful-example/topology.py
+   * https://github.com/p4lang/tutorials/blob/master/SIGCOMM_2015/source_routing/topo.py
 
-   ```python
-   /home/anntsai/repos/p4/bmv2/tools/runtime_CLI.py --json < commands.txt
-   ./runtime_CLI.py ---json -thrift-port [port] 
-
-   table_set_default <table name> <action name> <action parameters>
-   table_add <table name> <action name> <match fields> => <action parameters> [priority]
-   table_delete <table name> <entry handle>
-   ```
-
-   9090 is the default port
+3. Add table entries to the switch using runtime CLI
+   * Supported CLI commands: See all by starting runtime_CLI.py and press <TAB>
+     ```
+     table_set_default <table name> <action name> <action parameters>
+     table_add <table name> <action name> <match fields> => <action parameters> [priority]
+     table_delete <table name> <entry handle>
+     ```
+   * Start CLI
+     ```shell
+     # Interative mode
+     $CLI_PATH [--json <JSON_for_switch>] [--thrift-port <port>]
+     # Input mode with a input file including adding entries commands
+     $CLI_PATH [--json <JSON_for_switch>] [--thrift-port <port>] < commands.txt
+     # Or add one entry at a time using "echo"
+     echo "<action>" | $CLI_PATH [--json <JSON_for_switch>]
+     ```
 
 4. Debugger
 
@@ -1260,35 +1255,18 @@ sudo python setup.py install
    sudo ./p4dbg.py [--thrift-port <port>]
    ```
 
-## tutorials
+# 其他
 
-```shell
-# install
-git clone https://github.com/p4lang/tutorials.git
+* [tutorials](https://github.com/p4lang/tutorials.git): See more examples and exercise here
+* xterm setings
 ```
+xterm -fa Monospace -fs 12
 
-每個 tutorial 都有個 commands.txt，指令都需要寫在裡面，更多參考 https://github.com/p4lang/behavioral-model#using-the-cli-to-populate-tablesi
-
-# TODO
+```
+* TODO
 - [ ] how to use debugger
 - [ ] event log tool
 - [ ] other tools
-
-#  相關論文
-
-### PISCES
-
-> software switch
-
-* programmable，可程式化，容易上手，不需要自改系統，意味著不需要專業知識
-* Protocol-Independent
-* domain-specific language (DSL)
-
-# 其他
-
-```
-xterm -fa Monospace -fs 12
-```
 
 ### scapy
 
