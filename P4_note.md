@@ -1106,12 +1106,18 @@ p4-validate _p4Programm_
 ```
 
 ## [bmv2](https://github.com/p4lang/behavioral-model)
-
-> **a P4 software switch.** The 2nd version of the behavioral model. It is a C++ software switch that will behave according to your P4 program
+> - behavioral-model version 2
+> - **a P4 software switch.**
+> - A C++ user-space software switch to emulate your P4 dataplane
+> - A set of tools to make development easier
+>   - runtime CLI to program
+>   - a GDB-like debugger
 
 Documentation: http://104.236.137.35/
+### Workflow
+![workflow](https://upload.cc/i1/2018/05/27/PWDlHN.png)
 
-targets
+### targets
 
 * [simple_router](https://github.com/p4lang/behavioral-model/tree/master/targets/simple_router)
   * smallest and simplest one, easy to get started
@@ -1121,37 +1127,12 @@ targets
   * the standard P4 target and although it includes a lot of functionality
   * the code is still relatively small and straightforward
 
-```shell
-# install
-git clone https://github.com/p4lang/behavioral-model.git bmv2
-
-# install dependencies
-./install_deps.sh 
-
-# build the code
-./autogen.sh
-./configure
-make
-```
+### thrift-port
+> 網路中 switch 的接口。runtime 階段可以使用這個接口來命令不同的 switch 做不同的事情。
+> ***bmv2 中預設為 9090***
 
 ## [p4c-bmv2](https://github.com/p4lang/p4c-bm)
 > **The reference P4 compiler**. The compiler for the behavioral model: it takes P4 program and output a **JSON** file which can be loaded by the behavioral model 
-
-```shell
-# install
-git clone https://github.com/p4lang/p4c-bm.git p4c-bmv2
-
-# install required Python dependencies
-sudo pip install -r requirements.txt
-
-# 
-sudo python setup.py install
-```
-
-#### thrift-port
-
-> 網路中 switch 的接口。runtime 階段可以使用這個接口來命令不同的 switch 做不同的事情。
-> ***P4 中預設為 9090***
 
 ## [p4-hlir](https://github.com/p4lang/p4-hlir)
 > p4-hlir translates P4 code to ***HLIR***(**H**igh-**L**evel **I**ntermediate **R**epresentation),
@@ -1279,7 +1260,7 @@ xterm -fa Monospace -fs 12
 * Scapy doc: http://www.secdev.org/projects/scapy/files/scapydoc.pdf
 
 
-### Run P4 on the machine of lab215 - Vagrant
+### Quick lab env construction with Vagrant
 
 * https://gogojimmy.net/2013/05/26/vagrant-tutorial/
 
