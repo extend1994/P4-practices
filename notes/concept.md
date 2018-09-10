@@ -27,9 +27,10 @@ P4 概念
   - ***P4 models the parser as a state machine.***  
     This can be represented as a *parse graph* with each state a node and the state transitions as edges.
   - switch 根據 parser graph 抓出 match 的 header
-- parser 對每個封包辨認 ( *recognize* ) 並提取 ( *extract* ) packet header fields，接著產生用於 *match+action table* 的 *Parsed Representation*，  
-  並進入 *Ingress Pipeline*
-  - ***可以把 Parsed Representation 看作提取出的 header/metadata fields***
+- parser 對每個封包辨認 ( *recognize* ) 並提取 ( *extract* ) packet header fields，產生用於 **Parsed Representation**，並進入 *Ingress Pipeline*
+  - 可以把 Parsed Representation 看作提取出的 header/metadata fields
+  - Match+Action tables operate on the PR header instances
+  - The packet is regenerated based on the updated PR header instances
 - *Ingress Pipeline*
   - 封包被送往不同的 table，可能會被更改或只是單純設定 output port 等
   - Pipeline 中的 match+action tables 產生 *Egress Specification*，用來決定封包要送往哪個（些）port(s)
