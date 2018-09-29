@@ -230,38 +230,3 @@ field_list listName {
   ...
 }
 ```
-
-## Examples
-
-# 相關主題
-## Flowlet
-
-## 相關工具
-
-###  tutorials
-
-到 p4lang 的 [tutorials](https://github.com/p4lang/tutorials.git) 可以找到更多範例及相關資源
-
-### xterm
-
-- 設定
-
-  ```shell
-  xterm -fa Monospace -fs 12
-  ```
-
-* TODO
-- [ ] how to use debugger
-- [ ] event log tool
-- [ ] other tools
-
-### scrapy
-
-* [Scapy documentation](http://scapy.readthedocs.io/en/latest/index.html)
-* Communication commands: [sniff](http://xiaix.me/python-shi-yong-scapy-jin-xing-zhua-bao/)
-
-### Vagrant
-
-> 自動化虛擬機的安裝和配置過程，如開機、安裝 MySQL、網路環境配置、主機與虛擬機間的文件共享等，配合 *Vagrantfile* 使用。Vagrant 視虛擬機為「Provider」、映像檔（ Image ）為「Box」
-
-* https://gogojimmy.net/2013/05/26/vagrant-tutorial/
