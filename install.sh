@@ -8,6 +8,14 @@ COMMON_PATH=~/p4-repos/common
 NUM_CORES=$(grep -c ^processor /proc/cpuinfo)
 SYSTEM_BASE=$(grep "ID_LIKE" /etc/os-release | awk -F'=' '{print $2}')
 
+echo "Checking your OS..."
+if [ ${OSTYPE} != "linux-gnu" ] || [ ${SYSTEM_BASE} != "debian" ]; then
+  echo "Can't apply this script in your OS"
+  exit 1
+else
+  echo "Continue to set your P4 environment :)"
+fi
+
 mkdir -p ${P4PATH} && cd ${P4PATH}
 
 echo "Install p4_14 or p4_16? [14/16(Default)]"
