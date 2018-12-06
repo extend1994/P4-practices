@@ -18,6 +18,24 @@
 
 [Link](http://scapy.readthedocs.io/en/latest/index.html)
 
+### 自訂封包
+
+[欄位說明](https://scapy.readthedocs.io/en/latest/build_dissect.html#fields)
+
+```python
+class shim_header(Packet):
+    name = "shim_header"
+    fields_desc = [
+        BitField("int_type",0,8),
+        BitField("rsvd1"   ,0,8),
+        BitField("len"     ,0,8),
+        BitField("dscp"    ,0,6),
+        BitField("rsvd2"   ,0,2)
+    ]
+```
+
+可用 `bind_layers` 指名現有 protocols 的前後連接關係，如 `bind_layers(TCP, shim_header)`
+
 ### 常用函式
 
 #### 送封包
