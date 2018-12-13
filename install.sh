@@ -30,6 +30,9 @@ if [ -z $p4Version ]; then
   p4Version="16"
 else
 
+  echo "Install P4 vim syntax..."
+  curl -o- -L http://bit.ly/2LjrOgh | bash
+
   mkdir -p ${COMMON_PATH} && cd ${COMMON_PATH}
   if [ -e "protobuf" ]; then
     echo "protobuf repo has existed!"
